@@ -1,29 +1,12 @@
-# insp-qf
+# React + Vite
 
-Formulario digital para inspección y control de calidad de productos en Farmacia Magistral.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## 🧾 Descripción
+Currently, two official plugins are available:
 
-Esta aplicación permite registrar los datos de inspección de lotes, conforme a los criterios de calidad establecidos (defectos críticos, mayores y menores). Diseñada para optimizar el proceso de auditoría interna.
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## ✨ Funcionalidades
+## Expanding the ESLint configuration
 
-- Registro de área, producto, lote y fecha
-- Marcar conformidad (C / NC)
-- Indicar tipo y cantidad de defectos (AQL)
-- Firma digital de responsables
-- (Opcional) Generación de PDF o historial
-
-## 💻 Tecnologías
-
-- 
-- 
-- 
-
-## 🚀 Uso
-
-Puedes abrir el archivo `index.html` directamente en tu navegador o publicarlo en GitHub Pages.
-
-## 📄 Licencia
-
-Este proyecto es de uso interno. Uso externo requiere autorización.
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
