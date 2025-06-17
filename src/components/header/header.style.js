@@ -15,43 +15,15 @@ export const LogoSection = styled.div`
     padding: 0.5rem;
     border-right: 1px solid #d1d5db;
     display: flex;
+    justify-content: center;
     align-items: center;
     gap: 0.5rem;
 `;
-
-export const LogoCircle = styled.div`
-    width: 4rem;
-    height: 4rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #f0fdf4;
-    border-radius: 50%;
-    flex-shrink: 0;
-`;
-
-export const LogoText = styled.span`
-    color: #16a34a;
-    font-weight: bold;
-    font-size: 1.25rem;
-`;
-
-export const CompanyInfo = styled.div`
-    font-size: 0.75rem;
+export const Logo = styled.img`
+    height: 3rem;
+    width: auto;
     
-    .company-name {
-        font-weight: 600;
-        color: #16a34a;
-        margin: 0;
-    }
-    
-    .company-code {
-        font-weight: bold;
-        color: #16a34a;
-        margin: 0;
-    }
 `;
-
 // Sección principal (columna central)
 export const MainSection = styled.div`
     padding: 0.5rem;
@@ -66,7 +38,7 @@ export const Title = styled.p`
     font-weight: bold;
     font-size: 0.875rem;
     margin: 0 0 0.25rem 0;
-    color: #111827;
+    color:#000000;
 `;
 
 export const DocumentTypeInfo = styled.div`
@@ -75,7 +47,7 @@ export const DocumentTypeInfo = styled.div`
     
     p {
         margin: 0;
-        color: #374151;
+        color:rgb(0, 0, 0);
         
         span {
             font-weight: 500;

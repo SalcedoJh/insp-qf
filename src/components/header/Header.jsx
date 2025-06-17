@@ -2,9 +2,7 @@ import React from 'react';
 import {
     Container,
     LogoSection,
-    LogoCircle,
-    LogoText,
-    CompanyInfo,
+    Logo,
     MainSection,
     Title,
     DocumentTypeInfo,
@@ -20,7 +18,7 @@ import {
 } from './header.style.js';
 import './header.css';
 
-const Header = ({ 
+const Header = ({
     documentCode = "F.GE.MC.015",
     version = "00",
     pageNumber = "#",
@@ -33,13 +31,10 @@ const Header = ({
             {/* Header superior con 3 columnas */}
             <Container>
                 <LogoSection>
-                    <LogoCircle>
-                        <LogoText>QF</LogoText>
-                    </LogoCircle>
-                    <CompanyInfo>
-                        <p className="company-name">Farmacia Magistral</p>
-                        <p className="company-code">QF</p>
-                    </CompanyInfo>
+                    <Logo
+                        src="./logo-qf.png"
+                        alt="QF Logo">
+                    </Logo>
                 </LogoSection>
 
                 <MainSection>
@@ -73,13 +68,13 @@ const Header = ({
                     <ApprovalText>Coordinador de Calidad y Mejora Continua</ApprovalText>
                     <ApprovalDate>Fecha: {elaboratedDate}</ApprovalDate>
                 </ApprovalColumn>
-                
+
                 <ApprovalColumn>
                     <ApprovalTitle>REVISADO POR:</ApprovalTitle>
                     <ApprovalText>Jefe de Calidad y Mejora Continua</ApprovalText>
                     <ApprovalDate>Fecha: {reviewedDate}</ApprovalDate>
                 </ApprovalColumn>
-                
+
                 <ApprovalColumn>
                     <ApprovalTitle>APROBADO POR:</ApprovalTitle>
                     <ApprovalText>Jefe de Calidad y Mejora Continua</ApprovalText>
