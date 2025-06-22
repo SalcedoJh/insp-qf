@@ -66,7 +66,7 @@ const DefectsSection = ({
                     <InputContainer>
                         <DefectInput
                             type="text"
-                            value={DefectsData[index]?.units || ""}
+                            value={defectsData[index]?.units || ""}
                             onChange={(e) => onDefectChange(defectType, index, "units", e.target.value)}
                             placeholder="-"
                         />
