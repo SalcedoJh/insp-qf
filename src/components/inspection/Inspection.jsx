@@ -33,14 +33,17 @@ const Inspection = ({ formData, handleChange, handleSimpleChange }) => {
                 </BatchInfoField>
                 
                 <BatchInfoField>
-                    <FieldLabel>Nivel de inspección:</FieldLabel>
-                    <FieldInput
-                        type="text"
-                        value={formData.inspectionLevel}
-                        onChange={(e) => handleSimpleChange("inspectionLevel", e.target.value)}
-                        placeholder="Ingrese el nivel de inspección"
-                    />
-                </BatchInfoField>
+    <FieldLabel>Nivel de inspección:</FieldLabel>
+    <FieldSelect
+        value={formData.inspectionLevel}
+        onChange={(e) => handleSimpleChange("inspectionLevel", e.target.value)}
+    >
+        <option value="">Seleccione nivel de inspección</option>
+        <option value="I">Nivel I</option>
+        <option value="II">Nivel II</option>
+        <option value="III">Nivel III</option>
+    </FieldSelect>
+</BatchInfoField>
             </Container>
             
             
