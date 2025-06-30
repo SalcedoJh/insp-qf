@@ -32,15 +32,17 @@ const Inspection = ({ formData, handleChange, handleSimpleChange }) => {
                     />
                 </BatchInfoField>
                 
-                <BatchInfoField>
-                    <FieldLabel>Nivel de inspección:</FieldLabel>
+<BatchInfoField>
+                    <FieldLabel>Tamaño de muestra:</FieldLabel>
                     <FieldInput
                         type="text"
-                        value={formData.inspectionLevel}
-                        onChange={(e) => handleSimpleChange("inspectionLevel", e.target.value)}
-                        placeholder="Ingrese el nivel de inspección"
+                        value={formData.sampleSize}
+                        onChange={(e) => handleSimpleChange("sampleSize", e.target.value)}
+                        placeholder="Ingrese el tamaño de muestra"
                     />
                 </BatchInfoField>
+                
+</BatchInfoField>
             </Container>
             
             
