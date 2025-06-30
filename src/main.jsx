@@ -7,6 +7,8 @@ import QuestionnaireSection from './components/QuestionSection/QuestionSection.j
 import Inspection from './components/inspection/Inspection.jsx'
 import { initialFormData, handleSimpleChange, handleChange } from './components/inspection/Inspection.style.js'
 import DefectsSection from './components/defectos/Defectos.jsx'
+import Observations from './components/observation/Observation.jsx'
+import Evidence from './components/evidence/Evidence.jsx'
 
 const Root = () => {
 
@@ -45,6 +47,8 @@ const Root = () => {
         handleChange={(section, field, value) => handleChange(section, field, value, setFormData)}
         handleSimpleChange={(field, value) => handleSimpleChange(field, value, setFormData)}
       />
+      <Observations/>
+      <Evidence/>
     </>
   );
 };
