@@ -10,7 +10,7 @@ import './Inspection.css';
 const Inspection = ({ formData, handleChange, handleSimpleChange }) => {
     return (
         <>
-                       
+
             <Container>
                 <BatchInfoField>
                     <FieldLabel>Tamaño de lote:</FieldLabel>
@@ -21,7 +21,7 @@ const Inspection = ({ formData, handleChange, handleSimpleChange }) => {
                         placeholder="Ingrese el tamaño de lote"
                     />
                 </BatchInfoField>
-                
+
                 <BatchInfoField>
                     <FieldLabel>Tamaño de muestra:</FieldLabel>
                     <FieldInput
@@ -31,8 +31,8 @@ const Inspection = ({ formData, handleChange, handleSimpleChange }) => {
                         placeholder="Ingrese el tamaño de muestra"
                     />
                 </BatchInfoField>
-                
-<BatchInfoField>
+
+                <BatchInfoField>
                     <FieldLabel>Tamaño de muestra:</FieldLabel>
                     <FieldInput
                         type="text"
@@ -41,11 +41,11 @@ const Inspection = ({ formData, handleChange, handleSimpleChange }) => {
                         placeholder="Ingrese el tamaño de muestra"
                     />
                 </BatchInfoField>
-                
-</BatchInfoField>
+
+
             </Container>
-            
-            
+
+
         </>
     );
 };
