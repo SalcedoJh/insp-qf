@@ -9,6 +9,7 @@ import { initialFormData, handleSimpleChange, handleChange } from './components/
 import DefectsSection from './components/defectos/Defectos.jsx'
 import Observations from './components/observation/Observation.jsx'
 import Evidence from './components/evidence/Evidence.jsx'
+import Buttons from './components/buttons/Buttons.jsx'
 
 const Root = () => {
 
@@ -49,6 +50,7 @@ const Root = () => {
       />
       <Observations/>
       <Evidence/>
+      <Buttons/>
     </>
   );
 };

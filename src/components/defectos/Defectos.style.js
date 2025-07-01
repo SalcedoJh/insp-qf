@@ -19,7 +19,8 @@ export const Container = styled.div`
 
 // Encabezado de la sección
 export const SectionHeader = styled.p`
-    font-weight: 500;
+   
+    font-weight: bold;
     font-size: 0.875rem;
     color: #000;
     margin: 0 0 1rem 0;

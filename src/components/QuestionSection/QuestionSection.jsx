@@ -15,7 +15,7 @@ import './QuestionSection.css';
 const QuestionSection = ({ questionnaire = {}, onChange }) => {
     const questions = [
         "¿El formulador registra correctamente la información en la orden de producción?",
-        "¿El área de trabajo y los equipos se encuentran correctamente uniformados?",
+        "¿El formulador está correctamente uniformados?",
         "¿Las condiciones ambientales son registradas correctamente y se mantienen dentro de los parámetros establecidos?",
         "¿Las áreas se encuentran identificadas correctamente?",
         "¿El formulador realiza correctamente la limpieza del área, equipos y/o instrumentos?",

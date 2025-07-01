@@ -146,6 +146,95 @@ export const handleChange = (section, field, value, setFormData) => {
     }));
 };
 
+// Select para nivel de inspección
+export const Select = styled.select`
+    width: 100%;
+    border: 2px solid #000;
+    
+    padding: 0.25rem;
+    font-size: 0.875rem;
+    color: #000;
+    background-color: #fff;
+    border-radius: 4px;
+    outline: none;
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    cursor: pointer;
+    
+    @media (max-width: 768px) {
+        padding: 0.375rem;
+        font-size: 0.8125rem;
+    }
+    
+    &:focus {
+        border-color: #15803d;
+        box-shadow: 0 0 0 2px rgba(21, 128, 61, 0.2);
+        background-color: #f9fafb;
+
+    }
+    
+    &:hover {
+        border-color: #9ca3af;
+    }
+    
+    /* Estilos para opciones */
+    option {
+        padding: 0.5rem;
+        font-size: 0.875rem;
+        color: #000;
+        background-color: #fff;
+        
+        &:hover {
+            background-color: #f3f4f6;
+        }
+
+        
+        
+        &:disabled {
+            color: #6b7280;
+            background-color: #f9fafb;
+        }
+    }
+    
+    /* Estilos para select en estado disabled */
+    &:disabled {
+        background-color: #f3f4f6;
+        color: #6b7280;
+        cursor: not-allowed;
+        border-color: #d1d5db;
+    }
+    
+    /* Estilos para select con error */
+    &.error {
+        border-color: #dc2626;
+        background-color: #fef2f2;
+        
+        &:focus {
+            border-color: #dc2626;
+            box-shadow: 0 0 0 1px #dc2626;
+        }
+    }
+    
+    
+    /* Estilos para select válido */
+    &.valid {
+        border-color: #16a34a;
+        background-color: #f0fdf4;
+        
+        &:focus {
+            border-color: #16a34a;
+            box-shadow: 0 0 0 2px #16a34a;
+        }
+    }
+    
+    /* Personalizar la flecha del select */
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    background-size: 1rem;
+    padding-right: 2rem;
+`;
+
 // Función para validar los campos del lote
 export const validateBatchInfo = (formData) => {
     const errors = {};
