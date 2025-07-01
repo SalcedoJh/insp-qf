@@ -302,13 +302,13 @@ const Buttons = ({ formData }) => {
 
             const criticalDefectsList = [
                 "Filtración de producto.",
-                "Degradación visible del producto (color, olor, separación en fase, decantación).",
-                "Presencia de cuerpo extraño visible en contacto con el producto.",
-                "Envase con suciedad interna.",
-                "Envase sin contenido de producto o faltante.",
-                "Mezcla de materiales con otro producto o lote.",
-                "faltante de unidades",
-                "información ausente, incorrecta y/o incompleta (etiqueta de identifiación)",
+            "Degradación visible del producto (color, olor, separación en fase, decantación).",
+            "Presencia de cuerpo extraño visible en contacto con el producto.",
+            "Envase con suciedad interna.",
+            "Envase sin contenido de producto o faltante.",
+            "Mezcla de materiales con otro producto o lote.",
+            "faltante de unidades",
+            "información ausente, incorrecta y/o incompleta (etiqueta de identifiación)",
             ]
 
             const defectHeaders = ["Descripción", "Unidades"]
@@ -327,7 +327,7 @@ const Buttons = ({ formData }) => {
 
             const majorDefectsList = [
                 "Deterioro superficial o deterioro del material que afecten apariencia externa.",
-                "Tapas con precinto rota.",
+                "Tapas con presencia rota.",
                 "Mal estado del producto que no afecta su seguridad.",
                 "Dificultad para abrir o cerrar el envase (cuando aplique).",
                 "Ausencia de la cantidad contenida en el envase.",
@@ -344,7 +344,7 @@ const Buttons = ({ formData }) => {
             y = addSectionHeader("DEFECTOS MENORES (AQL 4%)", y)
 
             const minorDefectsList = [
-                "Envases ligeramente deformados.",
+                "Envaces ligeramente deformados.",
                 "Manchas o suciedad en el exterior.",
                 "Impresión de rotulado deficiente que no afecta la información.",
             ]
