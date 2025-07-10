@@ -24,8 +24,8 @@ export const Button = styled.button`
     gap: 0.5rem;
     cursor: pointer;
 
-    ${({ variant }) => 
-        variant === 'outline' ? `
+    ${({ $variant }) => 
+        $variant === 'outline' ? `
             border: 1px solid #e5e7eb;
             background-color: white;
             color: #374151;

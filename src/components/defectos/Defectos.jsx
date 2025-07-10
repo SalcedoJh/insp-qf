@@ -13,10 +13,9 @@ import {
 import './Defectos.css';
 
 const DefectsSection = ({
-    criticalDefects = [],
-    majorDefects = [],
-    minorDefects = [],
-    onDefectChange = () => {},
+    formData = {},
+    handleChange = () => {},
+    handleSimpleChange = () => {}
 }) => {
     const criticalDefectsList = [
         "Filtración de producto.",
@@ -44,8 +43,21 @@ const DefectsSection = ({
         "Manchas o suciedad en el exterior.",
         "Impresión de rotulado deficiente que no afecta la información.",
     ];
+    //funcion par abtener el valor del defecto
+    const getDefectValue = (defectType,index) => {
+        if (!formData[defectType] || !formData[defectType][index]) {
+            return "";
+        }
+        return formData[defectType][index].units || "";
+    };
 
-    const renderDefectSection = (title, defectsList, defectsData = [], defectType) => (
+    //funcion para manejar cambio en los defectos
+    const handleDefectChange = (defectType, index, field, value) => {
+        console.log(`Defect change: ${defectType}, index: ${index}, field: ${field}, value: ${value}`);
+        handleChange(defectType, index, {[field]: value});
+    };
+
+    const renderDefectSection = (title, defectsList, defectType) => (
         <DefectTable className="mb-4">
             <TableHeader>
                 <TableHeaderCell className="defect-type">
@@ -67,10 +79,11 @@ const DefectsSection = ({
                     </DefectDescription>
                     <InputContainer>
                         <DefectInput
-                            type="text"
-                            value={defectsData[index]?.units || ""}
-                            onChange={(e) => onDefectChange(defectType, index, "units", e.target.value)}
+                            type="number"
+                            value={getDefectValue(defectType, index)}
+                            onChange={(e) => {handleDefectChange(defectType, index, "units", e.target.value)}}
                             placeholder="-"
+                            
                         />
                     </InputContainer>
                 </TableRow>
@@ -88,7 +101,7 @@ const DefectsSection = ({
             {renderDefectSection(
                 "2.1 Defecto crítico (AQL 0.015%)",
                 criticalDefectsList,
-                criticalDefects,
+                
                 "criticalDefects"
             )}
 
@@ -96,7 +109,7 @@ const DefectsSection = ({
             {renderDefectSection(
                 "2.2 Defecto mayor (AQL 1%)",
                 majorDefectsList,
-                majorDefects,
+                
                 "majorDefects"
             )}
 
@@ -104,7 +117,7 @@ const DefectsSection = ({
             {renderDefectSection(
                 "2.3 Defecto menor (AQL 4%)",
                 minorDefectsList,
-                minorDefects,
+                
                 "minorDefects"
             )}
         </Container>

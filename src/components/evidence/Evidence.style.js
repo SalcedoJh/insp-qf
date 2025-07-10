@@ -106,6 +106,9 @@ export const ImageContainer = styled.div`
     border-radius: 0.375rem;
     overflow: hidden;
     transition: all 0.2s ease;
+
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    background: white;
     
     &:hover {
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
@@ -188,6 +191,8 @@ export const ImageWrapper = styled.div`
     aspect-ratio: 1;
     position: relative;
     overflow: hidden;
+    //
+    width: 100%;
 `;
 
 // Imagen de evidencia
@@ -196,6 +201,7 @@ export const EvidenceImage = styled.img`
     height: 100%;
     object-fit: cover;
     transition: transform 0.2s ease;
+    border-radius: 8px;
 `;
 
 // Nombre de la imagen
@@ -208,6 +214,8 @@ export const ImageName = styled.div`
     overflow: hidden;
     text-overflow: ellipsis;
     border-top: 1px solid #e5e7eb;
+
+    text-align: center;
 `;
 
 // Estado vacío
