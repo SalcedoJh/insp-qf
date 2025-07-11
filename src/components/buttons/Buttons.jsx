@@ -76,17 +76,123 @@ const Buttons = ({ formData = {} }) => {
             // Posición Y actual (para ir añadiendo contenido)
             let y = margin;
 
-            // ===== ENCABEZADO =====
+
             pdf.setFontSize(16);
             pdf.setFont("helvetica", "bold");
             pdf.text("REPORTE DE INSPECCIÓN DE CALIDAD", pageWidth / 2, y, { align: "center" });
             y += 10;
 
+            // ===== ENCABEZADO =====
+            // ===== ENCABEZADO DEL DOCUMENTO =====
+            // === Primera tabla con columna combinada (Pregunta / C / NC) ===
+            const firstTableWidth = pageWidth - margin * 2;
+
+            // Distribución: 25% - 50% - 25%
+            const col1Width = firstTableWidth * 0.25; // Pregunta (más angosto)
+            const col2Width = firstTableWidth * 0.50; // C (más ancho)
+            const col3Width = firstTableWidth * 0.25; // NC
+
+            const rowHeight = 13;
+            const cellX = margin;
+            let cellY = y;
+
+            pdf.setLineWidth(0.1);
+            pdf.setDrawColor(200); // gris claro
+
+            // === Celda combinada (Pregunta - 3 filas de alto) ===
+            pdf.rect(cellX, cellY, col1Width, rowHeight * 3);
+
+            // === Dibujar celdas de columna 2 y 3 (3 filas cada una) ===
+            for (let row = 0; row < 3; row++) {
+                const rowY = cellY + row * rowHeight;
+
+                // Columna 2 (C)
+                pdf.rect(cellX + col1Width, rowY, col2Width, rowHeight);
+
+                // Columna 3 (NC)
+                pdf.rect(cellX + col1Width + col2Width, rowY, col3Width, rowHeight);
+            }
+
+            // === Texto dentro de la tabla ===
+            pdf.setFontSize(10);
+            pdf.setFont("helvetica", "bold");
+
+            // Centrado vertical en la celda combinada
+            pdf.text("LOGO", cellX + col1Width / 2, cellY + rowHeight * 1.5, { align: "center" });
+
+            pdf.setFont("helvetica", "normal");
+
+
+            // Fila 1
+            const textY1 = cellY + 7;
+            pdf.text("REPORTE DE INSPECCIÓN DE CALIDAD", cellX + col1Width + col2Width / 2, textY1, { align: "center" });
+            pdf.text("CÓDIGO: F.GE.MC.015", cellX + col1Width + col2Width + col3Width / 1.15, textY1, { align: "right" });
+
+            // Fila 2
+            const textY2 = cellY + rowHeight + 7;
+            pdf.text("TIPO DE DOCUMENTO: Formato", cellX + col1Width + col2Width / 1.65, textY2, { align: "right" });
+            pdf.text("VERSIÓN: 00", cellX + col1Width + col2Width + col3Width / 1.95, textY2, { align: "right" });
+
+            // Fila 3
+            const textY3 = cellY + rowHeight * 2 + 7;
+            pdf.text("Area: Calidad y Mejora Continua", cellX + col1Width + col2Width / 1.7, textY3, { align: "right" });
+            pdf.text("PÁGINA: #", cellX + col1Width + col2Width + col3Width / 2.25, textY3, { align: "right" });
+            // Avanza para siguiente contenido
+
+
+            cellY += rowHeight * 3 + 2;
+
+
+
+            // ===== INFORMACIÓN DEL DOCUMENTO =====
+
+            const columnWidth = (pageWidth - 30) / 3;
+
+            pdf.setLineWidth(0.1);       // Línea delgada
+            pdf.setDrawColor(200);
+
+            // === Dibujar tabla 2 filas × 3 columnas ===
+            for (let row = 0; row < 2; row++) {
+                for (let col = 0; col < 3; col++) {
+                    pdf.rect(cellX + columnWidth * col, cellY + row * rowHeight, columnWidth, rowHeight);
+                }
+            }
+
+            // === Fila 1: Títulos y cargos ===
             pdf.setFontSize(10);
             pdf.setFont("helvetica", "normal");
-            pdf.text(`Código: F.GE.MC.015`, margin, y);
-            pdf.text(`Versión: 00`, pageWidth - margin, y, { align: "right" });
-            y += 15;
+
+            // ELABORADO POR
+            // Fila 1 - Títulos y Cargos
+            pdf.setFontSize(10);
+            pdf.setFont("helvetica", "normal");
+
+            // === ELABORADO POR ===
+            pdf.text("ELABORADO POR:", cellX + columnWidth / 1.8, cellY + 4, { align: "right" });
+            pdf.text("Coordinador de Calidad", cellX + columnWidth / 2, cellY + 8, { align: "center" });
+            pdf.text("y Mejora Continua", cellX + columnWidth / 2, cellY + 12, { align: "center" });
+
+            // === REVISADO POR ===
+            pdf.text("REVISADO POR:", cellX + columnWidth * 1.5, cellY + 4, { align: "right" });
+            pdf.text("Jefe de Calidad y Mejora", cellX + columnWidth * 1.5, cellY + 8, { align: "center" });
+            pdf.text("Continua", cellX + columnWidth * 1.5, cellY + 12, { align: "center" });
+
+            // === APROBADO POR ===
+            pdf.text("APROBADO POR:", cellX + columnWidth * 2.5, cellY + 4, { align: "right" });
+            pdf.text("Jefe de Calidad y Mejora", cellX + columnWidth * 2.5, cellY + 8, { align: "center" });
+            pdf.text("Continua", cellX + columnWidth * 2.5, cellY + 12, { align: "center" });
+
+            // === Fila 2: Fechas ===
+            const dateRowY = cellY + rowHeight + 6;
+
+            pdf.text("Fecha: 25/03/2024", cellX + columnWidth / 2, dateRowY, { align: "right" });
+            pdf.text("Fecha: 27/03/2024", cellX + columnWidth * 1.5, dateRowY, { align: "right" });
+            pdf.text("Fecha: 27/03/2024", cellX + columnWidth * 2.5, dateRowY, { align: "right" });
+
+            // Avanza el cursor para el siguiente contenido
+            y = cellY + rowHeight * 2 + 5;
+
+
 
             // ===== INFORMACIÓN DEL PRODUCTO =====
             pdf.setFontSize(12);
@@ -96,14 +202,13 @@ const Buttons = ({ formData = {} }) => {
 
             pdf.setFontSize(10);
             pdf.setFont("helvetica", "normal");
-            pdf.text(`Lote: ${formData.lot || 'No especificado'}`, margin, y);
-            pdf.text(`Área: ${formData.area || 'No especificada'}`, pageWidth / 2, y);
-            y += 5;
+            pdf.text(`Area: ${formData.area || 'No especificado'}`, margin, y);
+            pdf.text(`Fecha: ${formData.date || 'No especificada'}`, pageWidth / 1.4, y);
+            y += 8;
             pdf.text(`Producto: ${formData.product || 'No especificado'}`, margin, y);
-            y += 5;
-            pdf.text(`Fecha: ${formData.date || 'No especificada'}`, margin, y);
-            pdf.text(`Hora: ${formData.time || 'No especificada'}`, pageWidth / 2, y);
-            y += 15;
+            pdf.text(`Lote: ${formData.lot || 'No especificada'}`, pageWidth / 1.4, y);
+            y += 10;
+
 
             // Función para añadir texto con salto de línea automático
             const addWrappedText = (text, x, y, maxWidth, lineHeight = 7) => {
@@ -256,7 +361,7 @@ const Buttons = ({ formData = {} }) => {
 
             // ===== INFORMACIÓN DE TAMAÑO DE LOTE, MUESTRA Y NIVEL DE INSPECCIÓN =====
             y = checkPageBreak(y, 20);
-            
+
 
             const infoInspeccionHeaders = ["Tamaño de lote", "Tamaño de muestra", "Nivel de inspección"];
             const infoInspeccionRows = [
@@ -338,8 +443,8 @@ const Buttons = ({ formData = {} }) => {
             y = checkPageBreak(y, 40);
             y = addSectionHeader("OBSERVACIONES", y);
 
-            if (formData.observations ) {
-                y = addWrappedText(formData.observations , margin, y, contentWidth);
+            if (formData.observations) {
+                y = addWrappedText(formData.observations, margin, y, contentWidth);
             } else {
                 pdf.text("Sin observaciones", margin, y);
             }
@@ -347,44 +452,78 @@ const Buttons = ({ formData = {} }) => {
             y += 10;
 
             // ===== FIRMAS =====
-            y = checkPageBreak(y, 60);
+            y = checkPageBreak(y, 80);
             y = addSectionHeader("FIRMAS", y);
 
-            // Añadir firmas si existen
-            if (formData.signatures && (formData.signatures.assistant || formData.signatures.chief)) {
-                pdf.text("Asistente de Calidad", margin, y);
-                pdf.text("Jefe de Calidad y Mejora Continua", pageWidth / 2 + 10, y);
-                y += 5;
+            // Configuración de las firmas
+            const signatureBoxWidth = (pageWidth - 2 * margin - 20) / 2;
+            const signatureLineY = y + 30; // Línea donde va la firma
 
-                // Espacio para las firmas
-                pdf.setDrawColor(200, 200, 200);
-                pdf.rect(margin, y, pageWidth / 2 - margin - 10, 30);
-                pdf.rect(pageWidth / 2 + 10, y, pageWidth / 2 - margin - 10, 30);
+            // Estilo de línea
+            pdf.setDrawColor(100, 100, 100);
+            pdf.setLineWidth(0.5);
 
-                // Si hay firmas, añadirlas como imágenes
-                if (formData.signatures.assistant) {
-                    try {
-                        pdf.addImage(formData.signatures.assistant, "PNG", margin + 5, y + 5, pageWidth / 2 - margin - 20, 20);
-                    } catch (error) {
-                        console.error("Error al añadir firma del asistente:", error);
-                        pdf.text("Firma del Asistente", margin + 10, y + 15);
-                    }
-                }
+            // Dibujar solo línea inferior de firma
+            // Línea izquierda
+            const assistantX1 = margin;
+            const assistantX2 = margin + signatureBoxWidth;
+            pdf.line(assistantX1, signatureLineY, assistantX2, signatureLineY);
 
-                if (formData.signatures.chief) {
-                    try {
-                        pdf.addImage(formData.signatures.chief, "PNG", pageWidth / 2 + 15, y + 5, pageWidth / 2 - margin - 20, 20);
-                    } catch (error) {
-                        console.error("Error al añadir firma del jefe:", error);
-                        pdf.text("Firma del Jefe", pageWidth / 2 + 20, y + 15);
-                    }
-                }
+            // Línea derecha
+            const chiefX1 = margin + signatureBoxWidth + 20;
+            const chiefX2 = chiefX1 + signatureBoxWidth;
+            pdf.line(chiefX1, signatureLineY, chiefX2, signatureLineY);
 
-                y += 35;
+            // Añadir los nombres como firmas o línea punteada
+            pdf.setFontSize(16);
+            pdf.setFont("times", "italic");
+
+            // Asistente
+            if (formData.signatures?.assistant?.trim()) {
+                const assistantName = formData.signatures.assistant.trim();
+                const nameWidth = pdf.getTextWidth(assistantName);
+                const nameX = assistantX1 + (signatureBoxWidth - nameWidth) / 2;
+                pdf.text(assistantName, nameX, signatureLineY - 1.5);
             } else {
-                pdf.text("No hay firmas registradas", margin, y);
-                y += 10;
+                pdf.setFontSize(12);
+                pdf.setFont("helvetica", "normal");
+                pdf.text("____________________", assistantX1 + 10, signatureLineY - 5);
             }
+
+            // Jefe
+            if (formData.signatures?.chief?.trim()) {
+                const chiefName = formData.signatures.chief.trim();
+                const nameWidth = pdf.getTextWidth(chiefName);
+                const nameX = chiefX1 + (signatureBoxWidth - nameWidth) / 2;
+                pdf.setFontSize(16);
+                pdf.setFont("times", "italic");
+                pdf.text(chiefName, nameX, signatureLineY - 1.5);
+            } else {
+                pdf.setFontSize(12);
+                pdf.setFont("helvetica", "normal");
+                pdf.text("____________________", chiefX1 + 10, signatureLineY - 5);
+            }
+
+            // Añadir etiquetas debajo
+            pdf.setFontSize(10);
+            pdf.setFont("helvetica", "bold");
+
+            const labelY = signatureLineY + 10;
+
+            const assistantLabelText = "Asistente de Calidad";
+            const assistantLabelX = assistantX1 + (signatureBoxWidth - pdf.getTextWidth(assistantLabelText)) / 2;
+            pdf.text(assistantLabelText, assistantLabelX, labelY);
+
+            const chiefLabelText = "Jefe de Calidad y Mejora Continua";
+            const chiefLabelX = chiefX1 + (signatureBoxWidth - pdf.getTextWidth(chiefLabelText)) / 2;
+            pdf.text(chiefLabelText, chiefLabelX, labelY);
+
+            // Actualizar Y
+            y = labelY + 15;
+
+            // Debug
+            console.log("Firmas disponibles:", formData.signatures);
+
 
             // ===== EVIDENCIAS =====
             if (formData.images && formData.images.length > 0) {

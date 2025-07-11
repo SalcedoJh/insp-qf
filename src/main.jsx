@@ -164,6 +164,8 @@ const Root = () => {
       <Buttons
         formData={{
           ...formData,
+          ...productData, // Datos del producto
+
           questionnaire, // C y NC
           images,        // imágenes de evidencias
           signatures,     // imágenes base64 de las firmas
