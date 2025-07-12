@@ -39,6 +39,20 @@ const saveDataLocally = (key, data) => {
     }
 };
 
+// Función para cargar imagen desde public
+const loadImageFromPublic = (imagePath) => {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(new Error(`No se pudo cargar la imagen: ${imagePath}`));
+        img.src = imagePath;
+
+        // Timeout para evitar esperar indefinidamente
+        setTimeout(() => reject(new Error(`Timeout al cargar imagen: ${imagePath}`)), 5000);
+    });
+};
+
 const Buttons = ({ formData = {} }) => {
     const [emailDialogOpen, setEmailDialogOpen] = useState(false);
     const [email, setEmail] = useState("");
@@ -113,33 +127,115 @@ const Buttons = ({ formData = {} }) => {
                 pdf.rect(cellX + col1Width + col2Width, rowY, col3Width, rowHeight);
             }
 
+            // === Cargar y añadir el logo ===
+            try {
+                // Intentar cargar el logo desde diferentes rutas posibles
+                const possiblePaths = [
+                    '/logo-qf.png',
+                    '/logo.jpg',
+                    '/logo.jpeg',
+                    '/assets/logo.png',
+                    '/assets/logo.jpg',
+                    '/assets/logo.jpeg',
+                    './logo.png',
+                    './logo.jpg',
+                    './logo.jpeg'
+                ];
+
+                let logoImg = null;
+                for (const path of possiblePaths) {
+                    try {
+                        logoImg = await loadImageFromPublic(path);
+                        console.log(`Logo cargado desde: ${path}`);
+                        break;
+                    } catch (error) {
+                        console.log(`No se pudo cargar logo desde: ${path}`);
+                        continue;
+                    }
+                }
+
+                if (logoImg) {
+                    // Calcular dimensiones del logo para que quepa en la celda
+                    const logoMaxWidth = col1Width - 4; // 2mm de margen a cada lado
+                    const logoMaxHeight = (rowHeight * 3) - 4; // 2mm de margen arriba y abajo
+
+                    // Calcular proporción para mantener aspect ratio
+                    const logoRatio = logoImg.width / logoImg.height;
+                    let logoWidth = logoMaxWidth;
+                    let logoHeight = logoWidth / logoRatio;
+
+                    // Si la altura es mayor que el espacio disponible, ajustar por altura
+                    if (logoHeight > logoMaxHeight) {
+                        logoHeight = logoMaxHeight;
+                        logoWidth = logoHeight * logoRatio;
+                    }
+
+                    // Centrar el logo en la celda
+                    const logoX = cellX + (col1Width - logoWidth) / 2;
+                    const logoY = cellY + ((rowHeight * 3) - logoHeight) / 2;
+
+                    // Añadir el logo al PDF
+                    pdf.addImage(logoImg, 'PNG', logoX, logoY, logoWidth, logoHeight);
+                } else {
+                    // Si no se puede cargar el logo, mostrar texto alternativo
+                    pdf.setFontSize(10);
+                    pdf.setFont("helvetica", "bold");
+                    pdf.text("LOGO", cellX + col1Width / 2, cellY + rowHeight * 1.5, { align: "center" });
+                }
+            } catch (error) {
+                console.error("Error al cargar logo:", error);
+                // Mostrar texto alternativo si hay error
+                pdf.setFontSize(10);
+                pdf.setFont("helvetica", "bold");
+                pdf.text("LOGO", cellX + col1Width / 2, cellY + rowHeight * 1.5, { align: "center" });
+            }
+
             // === Texto dentro de la tabla ===
             pdf.setFontSize(10);
             pdf.setFont("helvetica", "bold");
 
             // Centrado vertical en la celda combinada
-            pdf.text("LOGO", cellX + col1Width / 2, cellY + rowHeight * 1.5, { align: "center" });
+            //cerca
 
-            pdf.setFont("helvetica", "normal");
 
 
             // Fila 1
+            pdf.setFont("helvetica", "bold");
             const textY1 = cellY + 7;
             pdf.text("REPORTE DE INSPECCIÓN DE CALIDAD", cellX + col1Width + col2Width / 2, textY1, { align: "center" });
-            pdf.text("CÓDIGO: F.GE.MC.015", cellX + col1Width + col2Width + col3Width / 1.15, textY1, { align: "right" });
+            pdf.text("CÓDIGO:", cellX + col1Width + col2Width + col3Width / 12, textY1, { align: "left" });
+
+            pdf.setFont("helvetica", "normal");
+            pdf.text(" F.GE.MC.015", cellX + col1Width + col2Width + col3Width / 2.3, textY1, { align: "left" });
 
             // Fila 2
+            pdf.setFontSize(10);
+            pdf.setFont("helvetica", "bold");
             const textY2 = cellY + rowHeight + 7;
-            pdf.text("TIPO DE DOCUMENTO: Formato", cellX + col1Width + col2Width / 1.65, textY2, { align: "right" });
-            pdf.text("VERSIÓN: 00", cellX + col1Width + col2Width + col3Width / 1.95, textY2, { align: "right" });
+            pdf.text("TIPO DE DOCUMENTO:", cellX + col1Width + 2, textY2, { align: "left" });
+
+            pdf.setFont("helvetica", "normal");
+            pdf.text(" Formato", cellX + col1Width + 42, textY2, { align: "left" });
+
+            pdf.setFont("helvetica", "bold");
+            pdf.text("VERSIÓN:", cellX + col1Width + col2Width + 2, textY2, { align: "left" });
+
+            pdf.setFont("helvetica", "normal");
+            pdf.text(" 00", cellX + col1Width + col2Width + 19, textY2, { align: "left" });
 
             // Fila 3
             const textY3 = cellY + rowHeight * 2 + 7;
-            pdf.text("Area: Calidad y Mejora Continua", cellX + col1Width + col2Width / 1.7, textY3, { align: "right" });
-            pdf.text("PÁGINA: #", cellX + col1Width + col2Width + col3Width / 2.25, textY3, { align: "right" });
-            // Avanza para siguiente contenido
+            pdf.setFont("helvetica", "bold");
+            pdf.text("Area:", cellX + col1Width + 2, textY3, { align: "left" });
 
+            pdf.setFont("helvetica", "normal");
+            pdf.text(" Calidad y Mejora Continua", cellX + col1Width + 11, textY3, { align: "left" });
 
+            pdf.setFont("helvetica", "bold");
+            pdf.text("PÁGINA:", cellX + col1Width + col2Width + 2, textY3, { align: "left" });
+
+            pdf.setFont("helvetica", "normal");
+            pdf.text(" #", cellX + col1Width + col2Width + 18, textY3, { align: "left" });
             cellY += rowHeight * 3 + 2;
 
 
@@ -165,49 +261,117 @@ const Buttons = ({ formData = {} }) => {
             // ELABORADO POR
             // Fila 1 - Títulos y Cargos
             pdf.setFontSize(10);
-            pdf.setFont("helvetica", "normal");
+
 
             // === ELABORADO POR ===
+            pdf.setFont("helvetica", "bold");
             pdf.text("ELABORADO POR:", cellX + columnWidth / 1.8, cellY + 4, { align: "right" });
+
+            pdf.setFont("helvetica", "normal");
             pdf.text("Coordinador de Calidad", cellX + columnWidth / 2, cellY + 8, { align: "center" });
             pdf.text("y Mejora Continua", cellX + columnWidth / 2, cellY + 12, { align: "center" });
 
             // === REVISADO POR ===
+            pdf.setFont("helvetica", "bold");
             pdf.text("REVISADO POR:", cellX + columnWidth * 1.5, cellY + 4, { align: "right" });
+
+            pdf.setFont("helvetica", "normal");
             pdf.text("Jefe de Calidad y Mejora", cellX + columnWidth * 1.5, cellY + 8, { align: "center" });
             pdf.text("Continua", cellX + columnWidth * 1.5, cellY + 12, { align: "center" });
 
             // === APROBADO POR ===
+            pdf.setFont("helvetica", "bold");
             pdf.text("APROBADO POR:", cellX + columnWidth * 2.5, cellY + 4, { align: "right" });
+
+            pdf.setFont("helvetica", "normal");
             pdf.text("Jefe de Calidad y Mejora", cellX + columnWidth * 2.5, cellY + 8, { align: "center" });
             pdf.text("Continua", cellX + columnWidth * 2.5, cellY + 12, { align: "center" });
 
             // === Fila 2: Fechas ===
             const dateRowY = cellY + rowHeight + 6;
 
-            pdf.text("Fecha: 25/03/2024", cellX + columnWidth / 2, dateRowY, { align: "right" });
-            pdf.text("Fecha: 27/03/2024", cellX + columnWidth * 1.5, dateRowY, { align: "right" });
-            pdf.text("Fecha: 27/03/2024", cellX + columnWidth * 2.5, dateRowY, { align: "right" });
 
+            pdf.setFont("helvetica", "bold");
+            pdf.text("Fecha:", cellX + columnWidth / 5, dateRowY, { align: "right" });
+
+            pdf.setFont("helvetica", "normal");
+            pdf.text("25/03/2024", cellX + columnWidth / 4.5, dateRowY, { align: "left" });
+
+            pdf.setFont("helvetica", "bold");
+            pdf.text("Fecha:", cellX + columnWidth * 1.5 - 17, dateRowY, { align: "right" });
+
+            pdf.setFont("helvetica", "normal");
+            pdf.text("27/03/2024", cellX + columnWidth * 1.5 - 16, dateRowY, { align: "left" });
+
+            pdf.setFont("helvetica", "bold");
+            pdf.text("Fecha:", cellX + columnWidth * 2.5 - 17, dateRowY, { align: "right" });
+
+            pdf.setFont("helvetica", "normal");
+            pdf.text("27/03/2024", cellX + columnWidth * 2.5 - 16, dateRowY, { align: "left" });
             // Avanza el cursor para el siguiente contenido
-            y = cellY + rowHeight * 2 + 5;
+            y = cellY + rowHeight * 2 + 10;
 
 
 
             // ===== INFORMACIÓN DEL PRODUCTO =====
-            pdf.setFontSize(12);
-            pdf.setFont("helvetica", "bold");
-            pdf.text("INFORMACIÓN DEL PRODUCTO", margin, y);
-            y += 7;
+            
 
             pdf.setFontSize(10);
+
+            // === Línea 1: Area y Fecha ===
+            pdf.setFont("helvetica", "bold");
+            pdf.text("Area:", margin, y);
+
             pdf.setFont("helvetica", "normal");
-            pdf.text(`Area: ${formData.area || 'No especificado'}`, margin, y);
-            pdf.text(`Fecha: ${formData.date || 'No especificada'}`, pageWidth / 1.4, y);
+            pdf.text(` ${formData.area || 'No especificado'}`, margin + 10, y);
+
+            pdf.setFont("helvetica", "bold");
+            pdf.text("Fecha:", pageWidth / 1.4, y);
+
+            pdf.setFont("helvetica", "normal");
+            pdf.text(` ${formData.date || 'No especificada'}`, pageWidth / 1.4 + 12, y);
+
             y += 8;
-            pdf.text(`Producto: ${formData.product || 'No especificado'}`, margin, y);
-            pdf.text(`Lote: ${formData.lot || 'No especificada'}`, pageWidth / 1.4, y);
+
+            // funcion para devirter el texto a una nueva línea si es muy largo
+            function splitTextByWords(text, wordsPerLine = 6) {
+                const words = text.trim().split(/\s+/); // separar por espacios
+                const lines = [];
+
+                for (let i = 0; i < words.length; i += wordsPerLine) {
+                    lines.push(words.slice(i, i + wordsPerLine).join(' '));
+                }
+
+                return lines;
+            }
+
+
+            // === Línea 2: Producto y Lote ===
+            pdf.setFont("helvetica", "bold");
+            pdf.text("Producto:", margin, y);
+
+            pdf.setFont("helvetica", "normal");
+            const productText = formData.product || 'No especificado';
+            const wrappedLines = splitTextByWords(productText, 8); // o usa 8 si prefieres
+
+            // Posición en la mitad derecha de la hoja
+            const rightX = pageWidth / 2 - 70; // 10 mm después del centro
+            let textY = y; // y actual, no lo modificamos directamente por si se usa después
+
+            wrappedLines.forEach(line => {
+                pdf.text(line, rightX, textY);
+                textY += 6; // espacio entre líneas
+            });
+
+
+            pdf.setFont("helvetica", "bold");
+            pdf.text("Lote:", pageWidth / 1.4, y);
+
+            pdf.setFont("helvetica", "normal");
+            pdf.text(` ${formData.lot || 'No especificada'}`, pageWidth / 1.4 + 9, y);
+
             y += 10;
+
 
 
             // Función para añadir texto con salto de línea automático
@@ -373,7 +537,7 @@ const Buttons = ({ formData = {} }) => {
             y += 5;
 
             y = addSectionHeader("2. Indicar la cantidad de unidades con el defecto detectado, caso contrario colocar (-).", y);
-
+            y += 2;
             // ===== DEFECTOS =====
             // Defectos críticos
             y = checkPageBreak(y, 40);
