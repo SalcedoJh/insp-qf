@@ -613,7 +613,7 @@ const Buttons = ({ formData = {} }) => {
                 pdf.text("Sin observaciones", margin, y);
             }
 
-            y += 10;
+            y += 3;
 
             // ===== FIRMAS =====
             y = checkPageBreak(y, 80);

@@ -11,6 +11,8 @@ import Observations from './components/observation/Observation.jsx'
 import Evidence from './components/evidence/Evidence.jsx'
 import Firmas from './components/firma/Firmas.jsx'
 import Buttons from './components/buttons/Buttons.jsx'
+import Cabecera from './components/Cabecera/Cabecera.jsx'
+import HistoryModal from './components/History/HistoryModal.jsx'
 
 
 const Root = () => {
@@ -95,6 +97,19 @@ const Root = () => {
     setImages((prev) => [...prev, ...newImages]);
   };
 
+  // Estado para el modal de historial
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+
+  // Función para manejar el historial
+  const handleHistoryClick = () => {
+    setIsHistoryOpen(true);
+  };
+
+  // Función para cerrar el modal de historial
+  const handleCloseHistory = () => {
+    setIsHistoryOpen(false);
+  };
+
   // Eliminar una imagen individual
   const handleRemoveImage = (index) => {
     setImages((prev) => prev.filter((_, i) => i !== index));
@@ -119,6 +134,7 @@ const Root = () => {
 
   return (
     <>
+      <Cabecera onHistoryClick={handleHistoryClick} />
       <GlobalStyles />
       <Header />
       <ProductSection
@@ -169,8 +185,12 @@ const Root = () => {
           questionnaire, // C y NC
           images,        // imágenes de evidencias
           signatures,     // imágenes base64 de las firmas
-          observations 
+          observations
         }}
+      />
+      <HistoryModal
+        isOpen={isHistoryOpen} 
+        onClose={handleCloseHistory}
       />
     </>
   );
