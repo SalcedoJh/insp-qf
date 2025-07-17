@@ -613,12 +613,12 @@ const Buttons = ({ formData = {} }) => {
                 pdf.text("Sin observaciones", margin, y);
             }
 
-            y += 3;
+            y += 1;
 
             // ===== FIRMAS =====
-            y = checkPageBreak(y, 80);
-            y = addSectionHeader("FIRMAS", y);
-
+            y = checkPageBreak(y-30, 1);
+            /*y = addSectionHeader("FIRMAS", y);
+            */
             // Configuración de las firmas
             const signatureBoxWidth = (pageWidth - 2 * margin - 20) / 2;
             const signatureLineY = y + 30; // Línea donde va la firma
@@ -886,6 +886,19 @@ const Buttons = ({ formData = {} }) => {
                         {loading.pdf ? <Loader2 className="animate-spin" /> : <Download />}
                     </IconWrapper>
                     Descargar PDF
+                </Button>
+
+                <Button>
+                    <IconWrapper>
+                        {loading.drive ? (
+                            <Loader2 className="animate-spin" />
+                        ) : success.drive ? (
+                            <Check className="text-success" />
+                        ) : (
+                            <Save />
+                        )}
+                    </IconWrapper>
+                    guardar
                 </Button>
 
                 <Button
