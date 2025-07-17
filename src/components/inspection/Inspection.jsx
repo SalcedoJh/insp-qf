@@ -27,11 +27,34 @@ const INSPECTION_TABLE = [
     { minSize: 150001.00, maxSize: 500000.99, levelI: 315, levelII: 800, levelIII: 1250 },
     { minSize: 500001.00, maxSize: Infinity, levelI: 500, levelII: 1250, levelIII: 2000 }
 ];
+
+// Función para extraer número y unidad de un string
+const parseValueWithUnit = (value) => {
+    if (!value) return { number: 0, unit: '' };
+    
+    // Buscar el patrón: número seguido de letras (unidad)
+    const match = value.toString().match(/^(\d*\.?\d+)\s*([a-zA-Z]*)$/);
+    
+    if (match) {
+        return {
+            number: parseFloat(match[1]),
+            unit: match[2] || ''
+        };
+    }
+    
+    // Si no tiene formato de unidad, asumir que es solo número
+    const numericValue = parseFloat(value);
+    return {
+        number: isNaN(numericValue) ? 0 : numericValue,
+        unit: ''
+    };
+};
 // Función para calcular el tamaño de muestra
 const calculateSampleSize = (batchSize, inspectionLevel) => {
     if (!batchSize || !inspectionLevel) return '';
     
-    const numericBatchSize = parseFloat(batchSize);
+    const { number: numericBatchSize, unit } = parseValueWithUnit(batchSize);
+    
     if (isNaN(numericBatchSize) || numericBatchSize <= 0) return '';
     
     // Encontrar el rango correcto en la tabla
@@ -56,13 +79,16 @@ const calculateSampleSize = (batchSize, inspectionLevel) => {
         default:
             return '';
     }
-    // Si el valor es "todo", retornar el tamaño de lote
+    
+    // Si el valor es "todo", retornar el tamaño de lote original con su unidad
     if (sampleSize === "todo") {
         return batchSize;
     }
     
-    return sampleSize.toString();
+    // Retornar el tamaño de muestra con la unidad del lote original
+    return unit ? `${sampleSize}${unit}` : sampleSize.toString();
 };
+
 const Inspection = ({ formData, handleChange, handleSimpleChange }) => {
     
     // Efecto para calcular automáticamente el tamaño de muestra
