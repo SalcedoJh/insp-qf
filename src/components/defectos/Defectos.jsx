@@ -83,6 +83,7 @@ const DefectsSection = ({
                             value={getDefectValue(defectType, index)}
                             onChange={(e) => {handleDefectChange(defectType, index, "units", e.target.value)}}
                             placeholder="-"
+                            min="0"
                             
                         />
                     </InputContainer>
