@@ -300,3 +300,49 @@ export const DialogButton = styled.button`
     transform: scale(0.98);
   }
 `;
+
+// Agrégalo al final de HistoryModal.style.js
+export const ErrorMessage = styled.div`
+  color: #ff4444;
+  background: #ffe6e6;
+  padding: 10px;
+  border-radius: 4px;
+  margin: 10px 0;
+  font-size: 14px;
+`;
+
+// Al final del archivo HistoryModal.style.js
+export const LoadingSpinner = styled.div`
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #3498db;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
+  margin: 10px auto;
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+`;
+
+export const RefreshButton = styled.button`
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s;
+
+  &:hover {
+    background: #2980b9;
+  }
+
+  &:disabled {
+    background: #bdc3c7;
+    cursor: not-allowed;
+  }
+`;
