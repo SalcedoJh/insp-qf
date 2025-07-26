@@ -21,7 +21,7 @@ Esta aplicación permite registrar los datos de inspección de lotes, conforme a
 
 ## 🚀 Uso
 
-Puedes abrir el archivo `index.html` directamente en tu navegador o publicarlo en GitHub Pages.
+Puedes abrir el formulario entrando a este link: https://insp-qf-ska5.vercel.app/
 
 ## 📄 Licencia
 
