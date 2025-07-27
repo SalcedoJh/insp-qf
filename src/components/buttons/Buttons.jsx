@@ -23,6 +23,28 @@ import {
 } from './Buttons.style';
 import './Buttons.css';
 
+
+// Función para guardar en db.json mediante API
+const saveToDbJson = async (reportData) => {
+    try {
+        const response = await fetch('http://localhost:3000/reportes', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(reportData),
+        });
+
+        if (!response.ok) {
+            throw new Error('Error al guardar en db.json');
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Error al guardar en db.json:', error);
+        throw error;
+    }
+};
 const saveDataLocally = (key, data) => {
     try {
         const existingData = JSON.parse(localStorage.getItem(key) || "[]");
@@ -53,7 +75,7 @@ const loadImageFromPublic = (imagePath) => {
     });
 };
 
-const Buttons = ({ formData = {} }) => {
+const Buttons = ({ formData = {}, setFormData }) => {
     const [emailDialogOpen, setEmailDialogOpen] = useState(false);
     const [email, setEmail] = useState("");
     const [subject, setSubject] = useState("Reporte de Inspección de Calidad");
@@ -61,14 +83,17 @@ const Buttons = ({ formData = {} }) => {
         pdf: false,
         drive: false,
         email: false,
+        save: false,
     });
     const [success, setSuccess] = useState({
         drive: false,
         email: false,
+        save: false,
     });
     const [error, setError] = useState({
         drive: null,
         email: null,
+        save: null,
     });
     const pdfDataRef = useRef(null);
 
@@ -314,7 +339,7 @@ const Buttons = ({ formData = {} }) => {
 
 
             // ===== INFORMACIÓN DEL PRODUCTO =====
-            
+
 
             pdf.setFontSize(10);
 
@@ -616,7 +641,7 @@ const Buttons = ({ formData = {} }) => {
             y += 1;
 
             // ===== FIRMAS =====
-            y = checkPageBreak(y-30, 1);
+            y = checkPageBreak(y - 30, 1);
             /*y = addSectionHeader("FIRMAS", y);
             */
             // Configuración de las firmas
@@ -874,6 +899,269 @@ const Buttons = ({ formData = {} }) => {
         }
     };
 
+    // Función para transformar formData al formato del db.json
+    const transformToDbJsonFormat = (data) => {
+        // Asegurarnos de que los defectos sean arrays válidos
+        const safeCriticalDefects = Array.isArray(data.criticalDefects) ? data.criticalDefects : [];
+        const safeMajorDefects = Array.isArray(data.majorDefects) ? data.majorDefects : [];
+        const safeMinorDefects = Array.isArray(data.minorDefects) ? data.minorDefects : [];
+
+        // Función segura para sumar unidades de defectos
+        const sumDefectUnits = (defects) => {
+            if (!Array.isArray(defects)) return 0;
+            return defects.reduce((sum, item) => sum + (Number(item?.units) || 0), 0);
+        };
+
+        // Calcular totales de defectos
+        const totalCriticos = sumDefectUnits(data.criticalDefects || []);
+        const totalMayores = sumDefectUnits(data.majorDefects || []);
+        const totalMenores = sumDefectUnits(data.minorDefects || []);
+        const totalGeneral = totalCriticos + totalMayores + totalMenores;
+
+        // Determinar el estado basado en los defectos y completitud
+        let estado = "pendiente";
+        if (data.completed) {
+            estado = totalGeneral > 0 ? "rechazado" : "aprobado";
+        }
+
+        return {
+            id: `INS-${new Date().getFullYear()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`,
+            estado: estado,
+            metadata: {
+                codigo: "F.GE.MC.015",
+                tipo_documento: "Formato",
+                version: "00",
+                area_responsable: "Calidad y Mejora Continua",
+                paginas: 1, // Se actualizará después de generar el PDF
+                completado: data.completed || false
+            },
+            elaboracion: {
+                elaborado_por: data.elaboradoPor || "Usuario actual",
+                revisado_por: data.revisadoPor || "",
+                aprobado_por: data.aprobadoPor || "",
+                fecha_elaboracion: data.fechaElaboracion || new Date().toISOString().split('T')[0],
+                fecha_revision: data.fechaRevision || "",
+                fecha_aprobacion: data.fechaAprobacion || ""
+            },
+            datos_inspeccion: {
+                area: data.area || "",
+                fecha: data.date || "",
+                producto: data.product || "",
+                lote: data.lot || "",
+                tamano_lote: data.batchSize || "",
+                tamano_muestra: data.sampleSize || "",
+                nivel_inspeccion: data.inspectionLevel || ""
+            },
+            cuestionario: [
+                {
+                    pregunta: "¿El formulador registra correctamente la información en la orden de producción?",
+                    conformidad: data.questionnaire?.q1 === "C",
+                    no_conformidad: data.questionnaire?.q1 === "NC"
+                },
+                {
+                    pregunta: "¿El formulador está correctamente uniformado?",
+                    conformidad: data.questionnaire?.q2 === "C",
+                    no_conformidad: data.questionnaire?.q2 === "NC"
+                },
+                {
+                    pregunta: "¿Las condiciones ambientales son registradas correctamente y se mantienen dentro de los parámetros establecidos?",
+                    conformidad: data.questionnaire?.q3 === "C",
+                    no_conformidad: data.questionnaire?.q3 === "NC"
+                },
+                {
+                    pregunta: "¿Las áreas se encuentran identificadas correctamente?",
+                    conformidad: data.questionnaire?.q4 === "C",
+                    no_conformidad: data.questionnaire?.q4 === "NC"
+                },
+                {
+                    pregunta: "¿El formulador realiza correctamente la limpieza del área, equipos y/o instrumentos?",
+                    conformidad: data.questionnaire?.q5 === "C",
+                    no_conformidad: data.questionnaire?.q5 === "NC"
+                },
+                {
+                    pregunta: "¿Se registra correctamente el análisis organoléptico del producto?",
+                    conformidad: data.questionnaire?.q6 === "C",
+                    no_conformidad: data.questionnaire?.q6 === "NC"
+                },
+                {
+                    pregunta: "¿La documentación del proceso se encuentra completa, vigente y legible?",
+                    conformidad: data.questionnaire?.q7 === "C",
+                    no_conformidad: data.questionnaire?.q7 === "NC"
+                }
+            ],
+            defectos: {
+                criticos: {
+                    aql: "0.015%",
+                    items: [
+                        {
+                            descripcion: "Filtración de producto",
+                            unidades: data.criticalDefects?.[0]?.units || 0
+                        },
+                        {
+                            descripcion: "Degradación visible del producto (color, olor, separación en fase, decantación)",
+                            unidades: data.criticalDefects?.[1]?.units || 0
+                        },
+                        {
+                            descripcion: "Presencia de cuerpo extraño visible en contacto con el producto",
+                            unidades: data.criticalDefects?.[2]?.units || 0
+                        },
+                        {
+                            descripcion: "Envase con suciedad interna",
+                            unidades: data.criticalDefects?.[3]?.units || 0
+                        },
+                        {
+                            descripcion: "Envase sin contenido de producto o faltante",
+                            unidades: data.criticalDefects?.[4]?.units || 0
+                        },
+                        {
+                            descripcion: "Mezcla de materiales con otro producto o lote",
+                            unidades: data.criticalDefects?.[5]?.units || 0
+                        },
+                        {
+                            descripcion: "Faltante de unidades",
+                            unidades: data.criticalDefects?.[6]?.units || 0
+                        },
+                        {
+                            descripcion: "Información ausente, incorrecta y/o incompleta (etiqueta de identificación)",
+                            unidades: data.criticalDefects?.[7]?.units || 0
+                        }
+                    ],
+                    total_defectos: totalCriticos
+                },
+                mayores: {
+                    aql: "1%",
+                    items: [
+                        {
+                            descripcion: "Deterioro superficial o deterioro del material que afecten apariencia externa",
+                            unidades: data.majorDefects?.[0]?.units || 0
+                        },
+                        {
+                            descripcion: "Tapas con presencia rota",
+                            unidades: data.majorDefects?.[1]?.units || 0
+                        },
+                        {
+                            descripcion: "Mal estado del producto que no afecta su seguridad",
+                            unidades: data.majorDefects?.[2]?.units || 0
+                        },
+                        {
+                            descripcion: "Dificultad para abrir o cerrar el envase (cuando aplique)",
+                            unidades: data.majorDefects?.[3]?.units || 0
+                        },
+                        {
+                            descripcion: "Ausencia de la cantidad contenida en el envase",
+                            unidades: data.majorDefects?.[4]?.units || 0
+                        },
+                        {
+                            descripcion: "Ausencia del peso tara en el etiquetado",
+                            unidades: data.majorDefects?.[5]?.units || 0
+                        }
+                    ],
+                    total_defectos: totalMayores
+                },
+                menores: {
+                    aql: "4%",
+                    items: [
+                        {
+                            descripcion: "Envases ligeramente deformados",
+                            unidades: data.minorDefects?.[0]?.units || 0
+                        },
+                        {
+                            descripcion: "Manchas o suciedad en el exterior",
+                            unidades: data.minorDefects?.[1]?.units || 0
+                        },
+                        {
+                            descripcion: "Impresión de rotulado deficiente que no afecta la información",
+                            unidades: data.minorDefects?.[2]?.units || 0
+                        }
+                    ],
+                    total_defectos: totalMenores
+                },
+                total_general: totalGeneral
+            },
+            observaciones: data.observations ? [data.observations] : [],
+            evidencias: data.images?.map((img, index) => ({
+                id: `img-${index + 1}`,
+                nombre: img.name || `evidencia-${index + 1}.jpg`,
+                url: img.url,
+                descripcion: img.description || ""
+            })) || []
+        };
+    };
+
+    // Función para resetear el formulario
+    const resetForm = () => {
+        setFormData({
+            area: '',
+            date: '',
+            product: '',
+            lot: '',
+            batchSize: '',
+            sampleSize: '',
+            inspectionLevel: '',
+            questionnaire: {},
+            criticalDefects: [],
+            majorDefects: [],
+            minorDefects: [],
+            observations: '',
+            images: [],
+            completed: false,
+            elaboradoPor: '',
+            revisadoPor: '',
+            aprobadoPor: '',
+            fechaElaboracion: '',
+            fechaRevision: '',
+            fechaAprobacion: ''
+        });
+
+        setValidationErrors({});
+        setTouchedFields({});
+    };
+
+    const handleSave = async () => {
+
+        // Validación básica antes de guardar
+        if (!formData.area || !formData.date) {
+            setError({ save: "Los campos Área y Fecha son requeridos" });
+            return;
+        }
+        setLoading(prev => ({ ...prev, save: true }));
+        setSuccess(prev => ({ ...prev, save: false }));
+        setError(prev => ({ ...prev, save: null }));
+
+        try {
+            // Transformar los datos al formato de db.json
+            const reportData = transformToDbJsonFormat(formData);
+
+            // Intentar guardar en db.json mediante API
+            try {
+                const savedReport = await saveToDbJson(reportData);
+                console.log('Reporte guardado en db.json:', savedReport);
+                alert("Reporte guardado correctamente");
+                setSuccess(prev => ({ ...prev, save: true }));
+                // Limpiar el formulario después de guardar exitosamente
+                resetForm(); // <-- Aquí llamamos a la función para limpiar el formulario
+            } catch (apiError) {
+                console.warn('No se pudo guardar en db.json, usando localStorage:', apiError);
+
+                // Fallback a localStorage
+                const saved = saveDataLocally("savedReports", reportData);
+                if (!saved) throw new Error("No se pudo guardar el reporte localmente");
+
+                setSuccess(prev => ({ ...prev, save: true }));
+            }
+
+            // Mostrar éxito por 3 segundos
+            setTimeout(() => {
+                setSuccess(prev => ({ ...prev, save: false }));
+            }, 3000);
+        } catch (error) {
+            console.error("Error al guardar:", error);
+            setError(prev => ({ ...prev, save: error.message }));
+        } finally {
+            setLoading(prev => ({ ...prev, save: false }));
+        }
+    };
+
     return (
         <Container>
             <ButtonsWrapper>
@@ -888,9 +1176,13 @@ const Buttons = ({ formData = {} }) => {
                     Descargar PDF
                 </Button>
 
-                <Button>
+                <Button
+                    onClick={handleSave}
+                    disabled={loading.save}
+                    className="relative"
+                >
                     <IconWrapper>
-                        {loading.drive ? (
+                        {loading.save ? (
                             <Loader2 className="animate-spin" />
                         ) : success.drive ? (
                             <Check className="text-success" />
@@ -898,7 +1190,13 @@ const Buttons = ({ formData = {} }) => {
                             <Save />
                         )}
                     </IconWrapper>
-                    guardar
+                    Guardar
+                    {success.save && (
+                        <SuccessIndicator>
+                            <span className="ping-dot" />
+                            <span className="solid-dot" />
+                        </SuccessIndicator>
+                    )}
                 </Button>
 
                 <Button
@@ -935,6 +1233,17 @@ const Buttons = ({ formData = {} }) => {
                     Enviar por correo
                 </Button>
             </ButtonsWrapper>
+
+            {/* Mostrar errores de guardado */}
+            {error.save && (
+                <ErrorAlert>
+                    <AlertCircle className="icon" />
+                    <ErrorContent>
+                        <p className="error-title">Error al guardar</p>
+                        <p className="error-message">{error.save}</p>
+                    </ErrorContent>
+                </ErrorAlert>
+            )}
 
             {emailDialogOpen && (
                 <DialogOverlay>

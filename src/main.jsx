@@ -1,4 +1,4 @@
-import { StrictMode, useState } from 'react'
+import React, { StrictMode, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import GlobalStyles from './global.style.js'
 import Header from './components/header/Header'
@@ -19,7 +19,10 @@ const Root = () => {
 
   const [questionnaire, setQuestionnaire] = useState({});
   const [formData, setFormData] = useState(initialFormData);
+  const [editingReportId, setEditingReportId] = useState(null);
 
+
+  
 
   // AGREGAR: Estado para ProductSection
   const [productData, setProductData] = useState({
@@ -120,6 +123,45 @@ const Root = () => {
     setImages((prev) => prev.filter((_, i) => !selectedIndexes.includes(i)));
   };
 
+  
+  const handleHistoryItemSelect = (item) => {
+
+    setEditingReportId(item.id); // Marcar que estás editando
+    // Actualiza productData
+    setProductData({
+      product: item.product || '',
+      lot: item.lot || '',
+      date: item.date || '',
+      area: item.area || ''
+    });
+
+    // Actualiza cuestionario si viene incluido
+    if (item.questionnaire) {
+      setQuestionnaire(item.questionnaire);
+    }
+
+    // Actualiza firmas
+    if (item.signatures) {
+      setSignatures(item.signatures);
+    }
+
+    // Actualiza observaciones
+    if (item.observations) {
+      setObservations(item.observations);
+    }
+
+    // Actualiza imágenes
+    if (item.images) {
+      setImages(item.images);
+    }
+
+    // Actualiza los defectos u otros campos de formData
+    setFormData(prev => ({
+      ...prev,
+      ...item, // esto incluye defectos, completado, estado, etc.
+    }));
+  };
+
 
   // Consolidar todos los datos para el PDF
   const consolidatedFormData = {
@@ -187,10 +229,12 @@ const Root = () => {
           signatures,     // imágenes base64 de las firmas
           observations
         }}
+        editingReportId={editingReportId}
       />
       <HistoryModal
-        isOpen={isHistoryOpen} 
+        isOpen={isHistoryOpen}
         onClose={handleCloseHistory}
+        onSelectItem={handleHistoryItemSelect}
       />
     </>
   );

@@ -21,11 +21,11 @@ class ApiService {
 
     try {
       const response = await fetch(`${this.baseUrl}${url}`, config);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data = await response.json();
       return data;
     } catch (error) {
@@ -132,7 +132,9 @@ class ApiService {
       status: reporte.estado,
       area: reporte.datos_inspeccion.area || 'Área no especificada',
       elaborado_por: reporte.elaboracion.elaborado_por,
-      total_defectos: reporte.defectos.total_general,
+      total_defectos: typeof reporte.defectos?.total_general === 'number'
+        ? reporte.defectos.total_general
+        : 0,
       completado: reporte.metadata.completado
     }));
   }

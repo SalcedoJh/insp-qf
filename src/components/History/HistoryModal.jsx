@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import apiService from '../../services/api';
-import { 
-  ModalOverlay, 
-  ModalContent, 
-  ModalHeader, 
-  ModalBody, 
+import {
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
   CloseButton,
   HistoryList,
   HistoryItem,
@@ -25,8 +25,27 @@ import {
   ErrorMessage,
   RefreshButton
 } from './HistoryModal.style.js';
+// Mapeo de estados en inglés a español
+const statusMap = {
+  'aprobado': 'approved',
+  'pendiente': 'pending',
+  'rechazado': 'rejected',
+  'approved': 'approved',
+  'pending': 'pending',
+  'rejected': 'rejected'
+};
 
-const HistoryModal = ({ isOpen, onClose }) => {
+// Mapeo inverso para mostrar en español
+const statusDisplayMap = {
+  'approved': 'aprobado',
+  'pending': 'pendiente',
+  'rejected': 'rechazado',
+  'aprobado': 'aprobado',
+  'pendiente': 'pendiente',
+  'rechazado': 'rechazado'
+};
+
+const HistoryModal = ({ isOpen, onClose, onSelectItem }) => {
   const [filter, setFilter] = useState('all'); // 'all', 'approved', 'pending', 'rejected'
   const [showConfirm, setShowConfirm] = useState(false);
   const [showClearAllConfirm, setShowClearAllConfirm] = useState(false);
@@ -36,25 +55,7 @@ const HistoryModal = ({ isOpen, onClose }) => {
   const [error, setError] = useState(null);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
 
-  // Mapeo de estados en inglés a español
-  const statusMap = {
-    'aprobado': 'approved',
-    'pendiente': 'pending',
-    'rechazado': 'rejected',
-    'approved': 'approved',
-    'pending': 'pending',
-    'rejected': 'rejected'
-  };
 
-  // Mapeo inverso para mostrar en español
-  const statusDisplayMap = {
-    'approved': 'aprobado',
-    'pending': 'pendiente',
-    'rejected': 'rechazado',
-    'aprobado': 'aprobado',
-    'pendiente': 'pendiente',
-    'rechazado': 'rechazado'
-  };
 
   // Cargar datos cuando se abre el modal
   useEffect(() => {
@@ -83,10 +84,10 @@ const HistoryModal = ({ isOpen, onClose }) => {
   const loadHistoryData = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       let reportes;
-      
+
       // Intentar cargar desde la API primero
       if (isOnline) {
         try {
@@ -103,11 +104,11 @@ const HistoryModal = ({ isOpen, onClose }) => {
       // Formatear los datos para el historial
       const formattedData = apiService.formatReportesForHistory(reportes);
       setHistoryData(formattedData);
-      
+
     } catch (err) {
       console.error('Error cargando historial:', err);
       setError('No se pudo cargar el historial. Mostrando datos de ejemplo.');
-      
+
       // Usar datos de respaldo
       const fallbackData = apiService.getFallbackData();
       const formattedData = apiService.formatReportesForHistory(fallbackData);
@@ -147,6 +148,52 @@ const HistoryModal = ({ isOpen, onClose }) => {
     }
   };
 
+  const handleLoadReport = (report) => {
+    const formData = {
+      area: report.datos_inspeccion?.area || '',
+      date: report.datos_inspeccion?.fecha || '',
+      product: report.datos_inspeccion?.producto || '',
+      lot: report.datos_inspeccion?.lote || '',
+      batchSize: report.datos_inspeccion?.tamano_lote || '',
+      sampleSize: report.datos_inspeccion?.tamano_muestra || '',
+      inspectionLevel: report.datos_inspeccion?.nivel_inspeccion || '',
+      questionnaire: {
+        q1: report.cuestionario?.[0]?.conformidad ? 'C' : report.cuestionario?.[0]?.no_conformidad ? 'NC' : '',
+        q2: report.cuestionario?.[1]?.conformidad ? 'C' : report.cuestionario?.[1]?.no_conformidad ? 'NC' : '',
+        q3: report.cuestionario?.[2]?.conformidad ? 'C' : report.cuestionario?.[2]?.no_conformidad ? 'NC' : '',
+        q4: report.cuestionario?.[3]?.conformidad ? 'C' : report.cuestionario?.[3]?.no_conformidad ? 'NC' : '',
+        q5: report.cuestionario?.[4]?.conformidad ? 'C' : report.cuestionario?.[4]?.no_conformidad ? 'NC' : '',
+        q6: report.cuestionario?.[5]?.conformidad ? 'C' : report.cuestionario?.[5]?.no_conformidad ? 'NC' : '',
+        q7: report.cuestionario?.[6]?.conformidad ? 'C' : report.cuestionario?.[6]?.no_conformidad ? 'NC' : ''
+      },
+      criticalDefects: report.defectos?.criticos?.items?.map(item => ({
+        units: item.unidades
+      })) || [],
+      majorDefects: report.defectos?.mayores?.items?.map(item => ({
+        units: item.unidades
+      })) || [],
+      minorDefects: report.defectos?.menores?.items?.map(item => ({
+        units: item.unidades
+      })) || [],
+      observations: report.observaciones?.join('\n') || '',
+      images: report.evidencias?.map(ev => ({
+        url: ev.url,
+        name: ev.nombre,
+        description: ev.descripcion
+      })) || [],
+      completed: report.metadata?.completado || false,
+      elaboradoPor: report.elaboracion?.elaborado_por || '',
+      revisadoPor: report.elaboracion?.revisado_por || '',
+      aprobadoPor: report.elaboracion?.aprobado_por || '',
+      fechaElaboracion: report.elaboracion?.fecha_elaboracion || '',
+      fechaRevision: report.elaboracion?.fecha_revision || '',
+      fechaAprobacion: report.elaboracion?.fecha_aprobacion || ''
+    };
+
+    onLoadReport(formData);
+    onClose();
+  };
+
   const handleDeleteClick = (item) => {
     setItemToDelete(item);
     setShowConfirm(true);
@@ -156,7 +203,7 @@ const HistoryModal = ({ isOpen, onClose }) => {
     if (itemToDelete) {
       try {
         setLoading(true);
-        
+
         // Intentar eliminar del servidor si está online
         if (isOnline) {
           try {
@@ -165,12 +212,12 @@ const HistoryModal = ({ isOpen, onClose }) => {
             console.warn('No se pudo eliminar del servidor:', apiError);
           }
         }
-        
+
         // Eliminar del estado local
         setHistoryData(prev => prev.filter(item => item.id !== itemToDelete.id));
         setShowConfirm(false);
         setItemToDelete(null);
-        
+
       } catch (error) {
         console.error('Error eliminando reporte:', error);
         setError('Error al eliminar el reporte');
@@ -192,12 +239,12 @@ const HistoryModal = ({ isOpen, onClose }) => {
   const handleConfirmClearAll = async () => {
     try {
       setLoading(true);
-      
+
       // Si está online, intentar eliminar todos del servidor
       if (isOnline) {
         try {
-          const deletePromises = historyData.map(item => 
-            apiService.deleteReporte(item.id).catch(err => 
+          const deletePromises = historyData.map(item =>
+            apiService.deleteReporte(item.id).catch(err =>
               console.warn(`Error eliminando ${item.id}:`, err)
             )
           );
@@ -206,10 +253,10 @@ const HistoryModal = ({ isOpen, onClose }) => {
           console.warn('Algunos reportes no se pudieron eliminar del servidor:', error);
         }
       }
-      
+
       setHistoryData([]);
       setShowClearAllConfirm(false);
-      
+
     } catch (error) {
       console.error('Error limpiando historial:', error);
       setError('Error al limpiar el historial');
@@ -238,6 +285,8 @@ const HistoryModal = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
+
+
   return (
     <>
       <ModalOverlay onClick={onClose}>
@@ -254,83 +303,83 @@ const HistoryModal = ({ isOpen, onClose }) => {
             <HeaderActions>
               <RefreshButton onClick={refreshData} disabled={loading}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <path 
-                    d="M1 4V10H7" 
-                    stroke="currentColor" 
-                    strokeWidth="2" 
-                    strokeLinecap="round" 
+                  <path
+                    d="M1 4V10H7"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
                     strokeLinejoin="round"
                   />
-                  <path 
-                    d="M23 20V14H17" 
-                    stroke="currentColor" 
-                    strokeWidth="2" 
-                    strokeLinecap="round" 
+                  <path
+                    d="M23 20V14H17"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
                     strokeLinejoin="round"
                   />
-                  <path 
-                    d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14L18.36 18.36A9 9 0 0 1 3.51 15" 
-                    stroke="currentColor" 
-                    strokeWidth="2" 
-                    strokeLinecap="round" 
+                  <path
+                    d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14L18.36 18.36A9 9 0 0 1 3.51 15"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
                     strokeLinejoin="round"
                   />
                 </svg>
                 {loading ? 'Actualizando...' : 'Actualizar'}
               </RefreshButton>
-              
+
               {historyData.length > 0 && (
                 <ClearAllButton onClick={handleClearAllClick} disabled={loading}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                    <path 
-                      d="M3 6H5H21" 
-                      stroke="currentColor" 
-                      strokeWidth="2" 
-                      strokeLinecap="round" 
+                    <path
+                      d="M3 6H5H21"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
                       strokeLinejoin="round"
                     />
-                    <path 
-                      d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" 
-                      stroke="currentColor" 
-                      strokeWidth="2" 
-                      strokeLinecap="round" 
+                    <path
+                      d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
                       strokeLinejoin="round"
                     />
                   </svg>
                   Vaciar Todo
                 </ClearAllButton>
               )}
-              
+
               <CloseButton onClick={onClose}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                  <path d="M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                  <path d="M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  <path d="M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                  <path d="M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                 </svg>
               </CloseButton>
             </HeaderActions>
           </ModalHeader>
-          
+
           <FilterSection>
-            <FilterButton 
-              $active={filter === 'all'} 
+            <FilterButton
+              $active={filter === 'all'}
               onClick={() => setFilter('all')}
             >
               Todos ({historyData.length})
             </FilterButton>
-            <FilterButton 
-              $active={filter === 'approved'} 
+            <FilterButton
+              $active={filter === 'approved'}
               onClick={() => setFilter('approved')}
             >
               Aprobados ({historyData.filter(item => statusMap[item.status] === 'approved').length})
             </FilterButton>
-            <FilterButton 
-              $active={filter === 'pending'} 
+            <FilterButton
+              $active={filter === 'pending'}
               onClick={() => setFilter('pending')}
             >
               Pendientes ({historyData.filter(item => statusMap[item.status] === 'pending').length})
             </FilterButton>
-            <FilterButton 
-              $active={filter === 'rejected'} 
+            <FilterButton
+              $active={filter === 'rejected'}
               onClick={() => setFilter('rejected')}
             >
               Rechazados ({historyData.filter(item => statusMap[item.status] === 'rejected').length})
@@ -356,9 +405,22 @@ const HistoryModal = ({ isOpen, onClose }) => {
               <HistoryList>
                 {filteredHistory.length > 0 ? (
                   filteredHistory.map(item => (
-                    <HistoryItem key={item.id}>
-                      <HistoryDate>{formatDate(item.date)}</HistoryDate>
-                      <HistoryTitle>
+                    <HistoryItem
+
+
+                    >
+                      <HistoryDate
+
+                      >{formatDate(item.date)}</HistoryDate>
+                      <HistoryTitle
+                        key={item.id}
+                        onClick={() => {
+                          onSelectItem && onSelectItem(item); // Envía los datos al padre
+                          onClose(); // Cierra el modal al seleccionar
+                        }}
+                        style={{ cursor: 'pointer' }}
+
+                      >
                         <strong>{item.product || 'Producto no especificado'}</strong>
                         {item.lot && ` - ${item.lot}`}
                         <br />
@@ -369,7 +431,7 @@ const HistoryModal = ({ isOpen, onClose }) => {
                           </small></>
                         )}
                         {item.total_defectos !== null && item.total_defectos !== undefined && (
-                          <><br /><small style={{ 
+                          <><br /><small style={{
                             color: item.total_defectos > 0 ? '#dc3545' : '#28a745',
                             fontWeight: 'bold'
                           }}>
@@ -385,38 +447,38 @@ const HistoryModal = ({ isOpen, onClose }) => {
                           </small></>
                         )}
                       </HistoryStatus>
-                      <DeleteButton 
+                      <DeleteButton
                         onClick={() => handleDeleteClick(item)}
                         title={`Eliminar reporte ${item.id}`}
                         disabled={loading}
                       >
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                          <path 
-                            d="M3 6H5H21" 
-                            stroke="currentColor" 
-                            strokeWidth="2" 
-                            strokeLinecap="round" 
+                          <path
+                            d="M3 6H5H21"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
                             strokeLinejoin="round"
                           />
-                          <path 
-                            d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" 
-                            stroke="currentColor" 
-                            strokeWidth="2" 
-                            strokeLinecap="round" 
+                          <path
+                            d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
                             strokeLinejoin="round"
                           />
-                          <path 
-                            d="M10 11V17" 
-                            stroke="currentColor" 
-                            strokeWidth="2" 
-                            strokeLinecap="round" 
+                          <path
+                            d="M10 11V17"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
                             strokeLinejoin="round"
                           />
-                          <path 
-                            d="M14 11V17" 
-                            stroke="currentColor" 
-                            strokeWidth="2" 
-                            strokeLinecap="round" 
+                          <path
+                            d="M14 11V17"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
                             strokeLinejoin="round"
                           />
                         </svg>
@@ -425,7 +487,7 @@ const HistoryModal = ({ isOpen, onClose }) => {
                   ))
                 ) : (
                   <NoResults>
-                    {filter === 'all' 
+                    {filter === 'all'
                       ? 'No se encontraron reportes en el historial'
                       : `No se encontraron reportes ${getStatusText(filter).toLowerCase()}`
                     }
@@ -474,7 +536,7 @@ const HistoryModal = ({ isOpen, onClose }) => {
               ¿Estás seguro de que deseas eliminar <strong>todos los reportes</strong> del historial?
             </p>
             <p style={{ fontSize: '0.875rem', color: '#6c757d' }}>
-              Se eliminarán <strong>{historyData.length} reportes</strong> permanentemente. 
+              Se eliminarán <strong>{historyData.length} reportes</strong> permanentemente.
               Esta acción no se puede deshacer.
             </p>
             <DialogActions>

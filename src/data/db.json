@@ -22,7 +22,7 @@
       "datos_inspeccion": {
         "area": "Área de Producción",
         "fecha": "2025-07-14",
-        "producto": "Producto de envasado - Categoría 1",
+        "producto": "Producto envaseado - Categoría 1",
         "lote": "PRD-789",
         "tamano_lote": "35 kl",
         "tamano_muestra": "11 kl",
@@ -232,7 +232,7 @@
         "criticos": {
           "aql": "0.015%",
           "items": [
-             {
+            {
               "descripcion": "Filtración de producto",
               "unidades": 0
             },
@@ -331,27 +331,27 @@
       ]
     },
     {
-      "id": "INS-2025-003",
+      "id": "INS-2025-SRU1",
       "estado": "pendiente",
       "metadata": {
         "codigo": "F.GE.MC.015",
         "tipo_documento": "Formato",
         "version": "00",
         "area_responsable": "Calidad y Mejora Continua",
-        "paginas": 2,
+        "paginas": 1,
         "completado": false
       },
       "elaboracion": {
-        "elaborado_por": "Luisa Ramírez",
+        "elaborado_por": "Usuario actual",
         "revisado_por": "",
         "aprobado_por": "",
-        "fecha_elaboracion": "2025-07-20",
+        "fecha_elaboracion": "2025-07-21",
         "fecha_revision": "",
         "fecha_aprobacion": ""
       },
       "datos_inspeccion": {
-        "area": "Área de Almacén",
-        "fecha": "2025-07-19",
+        "area": "",
+        "fecha": "",
         "producto": "",
         "lote": "",
         "tamano_lote": "",
@@ -361,38 +361,38 @@
       "cuestionario": [
         {
           "pregunta": "¿El formulador registra correctamente la información en la orden de producción?",
-          "conformidad": null,
-          "no_conformidad": null
+          "conformidad": false,
+          "no_conformidad": false
         },
         {
           "pregunta": "¿El formulador está correctamente uniformado?",
-          "conformidad": null,
-          "no_conformidad": null
+          "conformidad": false,
+          "no_conformidad": false
         },
         {
           "pregunta": "¿Las condiciones ambientales son registradas correctamente y se mantienen dentro de los parámetros establecidos?",
-          "conformidad": null,
-          "no_conformidad": null
+          "conformidad": false,
+          "no_conformidad": false
         },
         {
           "pregunta": "¿Las áreas se encuentran identificadas correctamente?",
-          "conformidad": null,
-          "no_conformidad": null
+          "conformidad": false,
+          "no_conformidad": false
         },
         {
           "pregunta": "¿El formulador realiza correctamente la limpieza del área, equipos y/o instrumentos?",
-          "conformidad": null,
-          "no_conformidad": null
+          "conformidad": false,
+          "no_conformidad": false
         },
         {
           "pregunta": "¿Se registra correctamente el análisis organoléptico del producto?",
-          "conformidad": null,
-          "no_conformidad": null
+          "conformidad": false,
+          "no_conformidad": false
         },
         {
           "pregunta": "¿La documentación del proceso se encuentra completa, vigente y legible?",
-          "conformidad": null,
-          "no_conformidad": null
+          "conformidad": false,
+          "no_conformidad": false
         }
       ],
       "defectos": {
@@ -400,85 +400,89 @@
           "aql": "0.015%",
           "items": [
             {
+              "descripcion": "Filtración de producto",
+              "unidades": 0
+            },
+            {
               "descripcion": "Degradación visible del producto (color, olor, separación en fase, decantación)",
-              "unidades": null
+              "unidades": 0
             },
             {
               "descripcion": "Presencia de cuerpo extraño visible en contacto con el producto",
-              "unidades": null
+              "unidades": 0
             },
             {
               "descripcion": "Envase con suciedad interna",
-              "unidades": null
+              "unidades": 0
             },
             {
               "descripcion": "Envase sin contenido de producto o faltante",
-              "unidades": null
+              "unidades": 0
             },
             {
               "descripcion": "Mezcla de materiales con otro producto o lote",
-              "unidades": null
+              "unidades": 0
             },
             {
-              "descripcion": "faltante de unidades",
-              "unidades": null
+              "descripcion": "Faltante de unidades",
+              "unidades": 0
             },
             {
-              "descripcion": "información ausente, incorrecta y/o incompleta (etiqueta de identifiación)",
-              "unidades": null
+              "descripcion": "Información ausente, incorrecta y/o incompleta (etiqueta de identificación)",
+              "unidades": 0
             }
           ],
-          "total_defectos": null
+          "total_defectos": 0
         },
         "mayores": {
           "aql": "1%",
           "items": [
             {
               "descripcion": "Deterioro superficial o deterioro del material que afecten apariencia externa",
-              "unidades": null
+              "unidades": 0
             },
             {
               "descripcion": "Tapas con presencia rota",
-              "unidades": null
+              "unidades": 0
             },
             {
               "descripcion": "Mal estado del producto que no afecta su seguridad",
-              "unidades": null
+              "unidades": 0
             },
             {
               "descripcion": "Dificultad para abrir o cerrar el envase (cuando aplique)",
-              "unidades": null
+              "unidades": 0
             },
             {
               "descripcion": "Ausencia de la cantidad contenida en el envase",
-              "unidades": null
+              "unidades": 0
             },
             {
               "descripcion": "Ausencia del peso tara en el etiquetado",
-              "unidades": null
+              "unidades": 0
             }
           ],
-          "total_defectos": null
+          "total_defectos": 0
         },
         "menores": {
           "aql": "4%",
           "items": [
             {
               "descripcion": "Envases ligeramente deformados",
-              "unidades": null
+              "unidades": 0
             },
             {
               "descripcion": "Manchas o suciedad en el exterior",
-              "unidades": null
+              "unidades": 0
             },
             {
-              "descripcion": "Impresión deficiente que no afecta información",
-              "unidades": null
+              "descripcion": "Impresión de rotulado deficiente que no afecta la información",
+              "unidades": 0
             }
           ],
-          "total_defectos": null
+          "total_defectos": 0
         },
-        "total_general": null
+        "total_general": 0
       },
       "observaciones": [],
       "evidencias": []
